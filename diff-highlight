@@ -1,0 +1,202 @@
+#!/usr/bin/env python3
+"""
+Diff Highlight - Show unified diff with color-coded added/removed lines.
+Usage: diff-highlight [--no-color] < old.diff
+       diff-highlight file1 file2
+       git diff | diff-highlight
+"""
+
+import argparse
+import sys
+import os
+
+# ANSI color codes
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+BOLD = '\033[1m'
+DIM = '\033[2m'
+RESET = '\033[0m'
+CLEAR_LINE = '\033[2K\r'
+
+# Try to use termcolor, fall back to ANSI
+try:
+    from termcolor import colored
+    HAS_TERMCOLOR = True
+except ImportError:
+    HAS_TERMCOLOR = False
+
+
+def color_added(line):
+    """Color an added line green."""
+    if HAS_TERMCOLOR:
+        return colored(line, 'green')
+    return f"{GREEN}{line}{RESET}"
+
+
+def color_removed(line):
+    """Color a removed line red."""
+    if HAS_TERMCOLOR:
+        return colored(line, 'red')
+    return f"{RED}{line}{RESET}"
+
+
+def color_header(line):
+    """Color a diff header line blue/bold."""
+    if HAS_TERMCOLOR:
+        return colored(line, 'blue', attrs=['bold'])
+    return f"{BOLD}{BLUE}{line}{RESET}"
+
+
+def color_context(line):
+    """Color a context line dim."""
+    if HAS_TERMCOLOR:
+        return colored(line, 'grey')
+    return f"{DIM}{line}{RESET}"
+
+
+def color_hunk_header(line):
+    """Color a hunk header."""
+    if HAS_TERMCOLOR:
+        return colored(line, 'magenta', attrs=['bold'])
+    return f"{BOLD}{line}{RESET}"
+
+
+def parse_unified_diff(lines):
+    """Parse unified diff format and yield colored lines."""
+    i = 0
+    in_diff = False
+    in_hunk = False
+    hunk_offset = 0
+    
+    while i < len(lines):
+        line = lines[i]
+        
+        # Detect start of a diff
+        if line.startswith('diff --git') or line.startswith('--- ') or line.startswith('+++ '):
+            in_diff = True
+            in_hunk = False
+            yield color_header(line.rstrip('\n'))
+            i += 1
+            continue
+        
+        # Hunk header
+        if line.startswith('@@'):
+            in_hunk = True
+            yield color_hunk_header(line.rstrip('\n'))
+            # Parse hunk offset for context tracking
+            parts = line.split('@@')
+            if len(parts) >= 2:
+                hunk_info = parts[1].strip().split(' ')[0] if parts[1].strip() else ""
+                # hunk_info like "-10,5 +12,7"
+            i += 1
+            continue
+        
+        # Content lines
+        if in_diff:
+            if line.startswith('+') and not line.startswith('+++'):
+                yield color_added(line.rstrip('\n'))
+            elif line.startswith('-') and not line.startswith('---'):
+                yield color_removed(line.rstrip('\n'))
+            elif line.startswith(' '):
+                yield color_context(line.rstrip('\n'))
+            elif in_hunk:
+                # Continuation of hunk content without prefix (edge case)
+                yield color_context(line.rstrip('\n'))
+            else:
+                # Non-diff content (like mode changes, new file notices)
+                yield color_header(line.rstrip('\n'))
+        else:
+            # Not in a recognized diff section, just yield as-is
+            yield line.rstrip('\n')
+        
+        i += 1
+
+
+def stream_diff(use_color=True):
+    """Stream diff from stdin, colorize, and output line by line."""
+    if not use_color:
+        # Strip ANSI codes
+        import re
+        ansi_pattern = re.compile(r'\x1b\[[0-9;]*m')
+        for line in sys.stdin:
+            stripped = ansi_pattern.sub('', line.rstrip('\n'))
+            if stripped:
+                print(stripped)
+        return
+    
+    for colored_line in parse_unified_diff(sys.stdin.readlines()):
+        print(colored_line)
+
+
+def compare_files(file1, file2, use_color=True):
+    """Compare two files and show diff."""
+    try:
+        import difflib
+    except ImportError:
+        print("diff-highlight: difflib not available", file=sys.stderr)
+        sys.exit(1)
+    
+    with open(file1, 'r') as f:
+        lines1 = f.readlines()
+    with open(file2, 'r') as f:
+        lines2 = f.readlines()
+    
+    # Generate unified diff
+    diff = difflib.unified_diff(
+        lines1, lines2,
+        fromfile=file1,
+        tofile=file2,
+        lineterm=''
+    )
+    
+    for line in parse_unified_diff(list(diff)):
+        print(line)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Colorize unified diff output with syntax highlighting.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  git diff | diff-highlight
+  git diff HEAD~1 | diff-highlight
+  diff-highlight old.c new.c
+  diff-highlight < changes.diff
+  git diff --no-color | diff-highlight --no-color
+        """
+    )
+    parser.add_argument('file1', nargs='?', help='First file to compare (with file2)')
+    parser.add_argument('file2', nargs='?', help='Second file to compare')
+    parser.add_argument('-c', '--color', action='store_true', default=True,
+                        help='Force color output (default)')
+    parser.add_argument('-nc', '--no-color', action='store_true',
+                        help='Disable color output')
+    parser.add_argument('-v', '--version', action='store_true',
+                        help='Show version')
+    
+    args = parser.parse_args()
+    
+    if args.version:
+        print("diff-highlight v1.0")
+        sys.exit(0)
+    
+    use_color = not args.no_color
+    
+    if args.file1 and args.file2:
+        compare_files(args.file1, args.file2, use_color=use_color)
+    elif args.file1 or args.file2:
+        print("diff-highlight: specify both files or pipe diff via stdin", file=sys.stderr)
+        sys.exit(1)
+    else:
+        # Read from stdin
+        if sys.stdin.isatty():
+            print("diff-highlight: waiting for diff on stdin...", file=sys.stderr)
+            print("Usage: git diff | diff-highlight", file=sys.stderr)
+        stream_diff(use_color=use_color)
+
+
+if __name__ == '__main__':
+    main()
