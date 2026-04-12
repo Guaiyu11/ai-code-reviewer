@@ -1,6 +1,15 @@
-# AI Code Reviewer
+# AI Code Reviewer Toolkit
 
-🤖 A pure CLI tool that automatically analyzes Python code and provides fix suggestions. No browser, no API keys, no cloud required.
+🤖 A collection of pure CLI tools for code analysis and generation. No browser, no API keys, no cloud required.
+
+## 🧰 Tools
+
+| Tool | Description |
+|------|-------------|
+| `ai_code_reviewer.py` | Analyze Python code for issues, security risks, and style problems |
+| `commit_gen.py` | Generate Conventional Commits messages from git diff |
+| `gitmoji_commits.py` | Generate gitmoji-based commit messages from git diff |
+| `readme_gen.py` | Auto-generate README.md from source code structure |
 
 ## Quick Demo
 
@@ -192,6 +201,33 @@ Total: 4 issue(s)
 | Style | Line length > 120, trailing whitespace, bare TODO |
 | Performance | String concatenation in loops |
 | Syntax | AST parse errors |
+
+## 🧩 Additional Tools
+
+### Gitmoji Commits (`gitmoji_commits.py`)
+
+Generate expressive gitmoji commit messages:
+
+```bash
+python gitmoji_commits.py                 # Generate from diff
+python gitmoji_commits.py -v              # Verbose with stats
+python gitmoji_commits.py -s              # Use staged changes
+python gitmoji_commits.py --list          # List all gitmojis
+```
+
+Output example: `✨ feat: add authentication (/+45 -12)`
+
+### README Generator (`readme_gen.py`)
+
+Auto-generate README.md from your source code:
+
+```bash
+python readme_gen.py .                    # Scan current directory
+python readme_gen.py . -o README.md       # Write to file
+python readme_gen.py . --force            # Overwrite existing
+```
+
+Generates: project structure tree, feature list, module documentation, usage examples.
 
 ## Roadmap
 
