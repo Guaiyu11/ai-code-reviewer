@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""
+CSV Viewer - View CSV files as formatted tables with column alignment, sorting, and filtering.
+Usage: csv-viewer <file> [--sort COL] [--filter "COL:VALUE"] [--limit N] [--no-color]
+"""
+
+import argparse
+import csv
+import sys
+from pathlib import Path
+from typing import Any, Optional
+
+# ANSI color codes
+COLORS = {
+    "reset": "\033[0m",
+    "bold": "\033[1m",
+    "dim": "\033[2m",
+    "red": "\033[91m",
+    "green": "\033[92m",
+    "yellow": "\033[93m",
+    "blue": "\033[94m",
+    "magenta": "\033[95m",
+    "cyan": "\033[96m",
+    "white": "\033[97m",
+}
+
+
+def colorize(text: str, color: str) -> str:
+    """Apply color to text."""
+    return f"{COLORS.get(color, '')}{text}{COLORS['reset']}"
+
+
+def read_csv(source) -> tuple[list[str], list[list[str]]]:
+    """Read CSV and return (headers, rows)."""
+    if hasattr(source, 'read'):
+        reader = csv.reader(source)
+    else:
+        path = Path(source)
+        if not path.exists():
+            print(f"Error: File not found: {source}", file=sys.stderr)
+            sys.exit(2)
+        reader = csv.reader(path.open(encoding='utf-8', errors='replace'))
+    
+    rows = list(reader)
+    if not rows:
+        return [], []
+    return rows[0], rows[1:]
+
+
+def format_table(headers: list[str], rows: list[list[str]], use_color: bool = True) -> None:
+    """Format and print CSV as a table."""
+    if not headers:
+        print("Empty CSV")
+        return
+    
+    # Calculate column widths
+    widths = [len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            widths[i] = max(widths[i], len(str(cell)))
+    
+    # Pad to min width 3
+    widths = [max(w, 3) for w in widths]
+    
+    def print_row(cells: list[str], color: Optional[str] = None):
+        parts = []
+        for w, cell in zip(widths, cells):
+            parts.append(str(cell).ljust(w))
+        line = " │ ".join(parts)
+        if use_color and color:
+            print(colorize(f"│ {line} │", color))
+        else:
+            print(f"│ {line} │")
+    
+    def print_sep(char: str = "─"):
+        sep = "─┼─".join(char * w for w in widths)
+        if use_color:
+            print(colorize("├─" + sep + "─┤", "dim"))
+        else:
+            print(f"├─{sep}─┤")
+    
+    header_color = "bold" if use_color else None
+    print_sep("═")
+    print_row(headers, header_color)
+    print_sep("═")
+    
+    for i, row in enumerate(rows):
+        row_color = "green" if i % 2 == 0 and use_color else None
+        print_row(row, row_color)
+    
+    print_sep("═")
+    print(f"{len(rows)} row(s)")
+
+
+def apply_sort(headers: list[str], rows: list[list[str]], sort_col: str) -> list[list[str]]:
+    """Sort rows by a column."""
+    try:
+        col_idx = headers.index(sort_col)
+    except ValueError:
+        print(f"Error: Column '{sort_col}' not found. Available: {', '.join(headers)}", file=sys.stderr)
+        sys.exit(1)
+    
+    try:
+        return sorted(rows, key=lambda r: float(r[col_idx]) if r[col_idx].replace('.', '', 1).replace('-', '', 1).isdigit() else r[col_idx].lower())
+    except (ValueError, IndexError):
+        return sorted(rows, key=lambda r: r[col_idx].lower())
+
+
+def apply_filter(headers: list[str], rows: list[list[str]], filter_expr: str) -> list[list[str]]:
+    """Filter rows where column contains value (case-insensitive)."""
+    if ':' not in filter_expr:
+        print(f"Error: Filter must be 'COL:VALUE'. Got: {filter_expr}", file=sys.stderr)
+        sys.exit(1)
+    
+    col, value = filter_expr.split(':', 1)
+    try:
+        col_idx = headers.index(col)
+    except ValueError:
+        print(f"Error: Column '{col}' not found. Available: {', '.join(headers)}", file=sys.stderr)
+        sys.exit(1)
+    
+    return [r for r in rows if value.lower() == r[col_idx].lower().strip()]
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="View CSV files as formatted tables.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  csv-viewer data.csv
+  csv-viewer data.csv --sort name
+  csv-viewer data.csv --filter "status:active"
+  csv-viewer data.csv --sort age --limit 10
+  cat data.csv | csv-viewer -
+        """
+    )
+    parser.add_argument('file', nargs='?', default='-', help='CSV file to view (use - for stdin)')
+    parser.add_argument('--sort', '-s', metavar='COL', help='Sort by column')
+    parser.add_argument('--filter', '-f', metavar='COL:VALUE', action='append', help='Filter rows (can be used multiple times)')
+    parser.add_argument('--limit', '-l', type=int, metavar='N', help='Limit number of rows')
+    parser.add_argument('--no-color', '-nc', action='store_true', help='Disable color output')
+    parser.add_argument('--delimiter', '-d', default=',', help='CSV delimiter (default: ,)')
+    
+    args = parser.parse_args()
+    
+    use_color = not args.no_color
+    
+    # Read CSV
+    try:
+        if args.file == '-':
+            if sys.stdin.isatty():
+                print("csv-viewer: waiting for CSV on stdin...", file=sys.stderr)
+                sys.exit(1)
+            reader = csv.reader(sys.stdin, delimiter=args.delimiter)
+        else:
+            reader = csv.reader(open(args.file, encoding='utf-8', errors='replace'), delimiter=args.delimiter)
+        
+        all_rows = list(reader)
+        if not all_rows:
+            print("Empty CSV")
+            sys.exit(0)
+        
+        headers = all_rows[0]
+        rows = all_rows[1:]
+    except Exception as e:
+        print(f"Error reading CSV: {e}", file=sys.stderr)
+        sys.exit(2)
+    
+    # Apply filters
+    if args.filter:
+        for f in args.filter:
+            rows = apply_filter(headers, rows, f)
+    
+    # Apply sort
+    if args.sort:
+        rows = apply_sort(headers, rows, args.sort)
+    
+    # Apply limit
+    if args.limit:
+        rows = rows[:args.limit]
+    
+    # Print
+    format_table(headers, rows, use_color)
+
+
+if __name__ == '__main__':
+    main()
