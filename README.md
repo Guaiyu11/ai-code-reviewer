@@ -1,161 +1,138 @@
-# AI Code Reviewer Toolkit
+# AI Code Reviewer
 
-🤖 A collection of pure CLI tools for code analysis, generation, and developer productivity. No browser, no API keys, no cloud required.
+A curated collection of Python CLI productivity tools for developers, generated and maintained by AI.
 
-## 🧰 Tools
+**100+ tools across 6 categories** | **100% Python** | **MIT License**
 
-### Code Quality & Review
+## Contents
 
-| Tool | Description |
-|------|-------------|
-| `ai_code_reviewer.py` | Analyze Python code for issues, security risks, and style problems |
-| `code-explainer.py` | Explain code structure, functions, and dependencies |
-| `dependency-audit.py` | Scan Python/Node projects for known vulnerabilities |
-| `test-generator.py` | Auto-generate pytest unit tests from Python source |
+| Directory | Description |
+|-----------|-------------|
+| `code/` | Code quality, API docs, testing, static analysis |
+| `git/` | Git commit helpers, gitignore generation |
+| `devops/` | System monitoring, Docker, cron, environment tools |
+| `data/` | JSON, CSV, YAML, XML format converters and validators |
+| `net/` | HTTP debugging, URL tools, network analysis |
+| `text/` | Text manipulation, formatting, search, statistics |
+| `util/` | Passwords, UUIDs, QR codes, screenshots, and more |
 
-### Git & Version Control
-
-| Tool | Description |
-|------|-------------|
-| `commit_gen.py` | Generate Conventional Commits messages from git diff |
-| `gitmoji_commits.py` | Generate gitmoji-based commit messages from git diff |
-| `git-history-analysis.py` | Analyze commit patterns, contributors, and code churn |
-| `diff-highlight.py` | Highlight git diffs in terminal |
-
-### Development Utilities
-
-| Tool | Description |
-|------|-------------|
-| `readme_gen.py` | Auto-generate README.md from source code structure |
-| `api-docs-gen.py` | Generate Markdown API docs from Python docstrings |
-| `code-timer.py` | Profile code execution time |
-| `log-analyzer.py` | Parse and summarize log files |
-| `env-validator.py` | Validate .env files and detect issues |
-
-### Data & Format Tools
-
-| Tool | Description |
-|------|-------------|
-| `json-formatter.py` | Format, minify, and validate JSON |
-| `json-schema-validator.py` | Validate JSON against JSON Schema |
-| `csv-viewer.py` | Preview and analyze CSV files in terminal |
-| `sql-formatter.py` | Format and analyze SQL queries |
-
-### Web & Network
-
-| Tool | Description |
-|------|-------------|
-| `http-debug.py` | Debug HTTP requests and responses |
-| `secret-scan.py` | Scan for exposed API keys and secrets |
-
-### DevOps & Infrastructure
-
-| Tool | Description |
-|------|-------------|
-| `dockerfile-linter.py` | Lint Dockerfiles for security and best practices |
-| `cron-parser.py` | Parse, explain, and preview cron expressions |
-
----
-
-## Quick Demo
+## Quick Start
 
 ```bash
-$ python3 ai_code_reviewer.py example.py
+# Install dependencies
+pip install -r requirements.txt
 
-🔍 Analyzing: example.py
+# Run any tool directly with Python
+python code/code-explainer.py your_code.py
 
-============================================================
-📋 CODE REVIEW REPORT: example.py
-============================================================
-
-🔴 ERRORS (1)
-  🔴 [ERROR] Line 5: Syntax error: invalid syntax
-
-🟡 WARNINGS (2)
-  🟡 [WARNING] Line 12: Hardcoded password detected
-  🟡 [WARNING] Line 23: Bare except clause
-
-🔵 INFO (1)
-  🔵 [INFO] Line 45: Line too long (145 chars)
-
-============================================================
-Total: 4 issue(s)
-============================================================
-
-$ echo $?
-1
+# Or make them executable
+chmod +x code/code-explainer.py
+./code/code-explainer.py your_code.py
 ```
 
-## Features
+## Directory Structure
 
-- 🔍 **Syntax checking** - Catches syntax errors before runtime
-- 🔒 **Security scanning** - Detects hardcoded passwords, API keys, dangerous functions
-- 🎨 **Style checks** - Line length, trailing whitespace, TODO without description
-- ⚡ **Best practices** - Bare except, mutable defaults, empty except clauses
-- 🚀 **Performance hints** - String concatenation in loops
-
-## Installation
-
-```bash
-git clone https://github.com/Guaiyu11/ai-code-reviewer.git
-cd ai-code-reviewer
-pip install -r requirements.txt  # if needed
+```
+ai-code-reviewer/
+├── README.md
+├── requirements.txt
+├── code/            # Code quality tools (9 tools)
+│   ├── code-explainer.py
+│   ├── test-generator.py
+│   ├── dependency-audit.py
+│   └── ...
+├── git/             # Git tools (3 tools)
+│   ├── commit_gen.py
+│   └── ...
+├── devops/          # DevOps tools (17 tools)
+│   ├── dockerfile-linter.py
+│   ├── cron-parser.py
+│   └── ...
+├── data/            # Data format tools (14 tools)
+│   ├── json-schema-validator.py
+│   ├── csv2json.py
+│   └── ...
+├── net/             # Network tools (15 tools)
+│   ├── http-headers.py
+│   ├── url-decode-all.py
+│   └── ...
+├── text/            # Text processing (53 tools)
+│   ├── regex-tester.py
+│   ├── sort-lines.py
+│   └── ...
+└── util/            # Utilities (27 tools)
+    ├── password-gen.py
+    ├── uuid-generator.py
+    └── ...
 ```
 
-## Usage Examples
+## Tools Overview
 
-```bash
-# Code review
-python3 ai_code_reviewer.py script.py
+### Code Quality (`code/`)
+- `code-explainer.py` - Explain code structure and dependencies
+- `test-generator.py` - Auto-generate pytest tests from Python code
+- `dependency-audit.py` - Scan for known vulnerabilities in dependencies
+- `api-docs-gen.py` - Generate Markdown API documentation from docstrings
+- `dockerfile-linter.py` - Dockerfile security and best practice checks
+- `git-history-analysis.py` - Analyze commit patterns and contributors
+- And more...
 
-# Generate tests
-python3 test-generator.py my_module.py
+### Git Tools (`git/`)
+- `commit_gen.py` - Generate conventional commit messages
+- `gitignore-gen.py` - Generate .gitignore files for any project
+- `gitmoji_commits.py` - Emoji-enhanced git commits
 
-# Audit dependencies
-python3 dependency-audit.py requirements.txt
+### DevOps (`devops/`)
+- `cron-parser.py` - Parse, explain, and preview cron expressions
+- `watch-process.py` - Monitor process CPU and memory in real-time
+- `kill-port.py` - Find and kill processes using specific ports
+- `env-exec.py` - Run commands with environment from .env files
+- And more...
 
-# Analyze git history
-python3 git-history-analysis.py --repo ./ --max 100
+### Data Formats (`data/`)
+- `json-schema-validator.py` - Validate JSON against schemas
+- `csv2json.py` / `json2csv.py` - Convert between CSV and JSON
+- `json2yaml.py` - JSON to YAML conversion
+- `pretty-xml.py` - Format and indent XML
+- `sql-formatter.py` - SQL formatting with performance analysis
+- And more...
 
-# Format SQL
-python3 sql-formatter.py "SELECT id,name FROM users WHERE active=1" --analyze
+### Network (`net/`)
+- `http-headers.py` - Show HTTP response headers
+- `url-decode-all.py` - Recursively decode URL-encoded text
+- `port-scan.py` - Scan common ports on remote hosts
+- `domain-info.py` - DNS and WHOIS lookup
+- `mac-vendor.py` - MAC address vendor/OUI lookup
+- And more...
 
-# Lint Dockerfile
-python3 dockerfile-linter.py Dockerfile
+### Text Processing (`text/`)
+- `regex-tester.py` - Live regex matching and testing
+- `sort-lines.py` - Sort lines by various criteria
+- `extract-emails.py` / `extract-urls.py` - Extract from text
+- `word-count.py` / `char-count.py` - Text statistics
+- `slug.py` - Convert text to URL-friendly slugs
+- And more...
 
-# Parse cron
-python3 cron-parser.py "0 9 * * 1-5" --next 5
+### Utilities (`util/`)
+- `password-gen.py` / `uuid-generator.py` - Generate secure passwords and UUIDs
+- `qrcode-gen.py` - Generate QR codes
+- `screenshot.py` - Take screenshots from CLI
+- `calc.py` - Expression calculator
+- `weather-cli.py` - Weather from CLI
+- And more...
 
-# Generate API docs
-python3 api-docs-gen.py my_module.py --output API.md
-```
+## Requirements
 
-## GitHub Actions Integration
+- Python 3.7+
+- See `requirements.txt` for additional dependencies
 
-```yaml
-name: Code Review
+## Contributing
 
-on: [push, pull_request]
+This repo is AI-generated and maintained. Tools are organized by category.
 
-jobs:
-  review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Run AI Code Reviewer
-        run: |
-          pip install -q .
-          python ai_code_reviewer.py ./src/ || true
-```
+## Donate
 
----
-
-## ❤️ Support This Project
-
-Nano (XNO) - fast, feeless, green:
+If you find this useful, consider donating Nano:
 
 ```
 nano_cix84h3anhf4xqxkro63x6go5onmoe8fh6qkqaoie8ddw8eyasuhigttg
@@ -163,4 +140,4 @@ nano_cix84h3anhf4xqxkro63x6go5onmoe8fh6qkqaoie8ddw8eyasuhigttg
 
 ## License
 
-MIT License
+MIT
