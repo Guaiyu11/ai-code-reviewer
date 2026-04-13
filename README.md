@@ -1,31 +1,37 @@
 # AI Code Reviewer
 
-A curated collection of Python CLI productivity tools for developers, generated and maintained by AI.
+A curated collection of 100+ Python CLI productivity tools for developers, generated and maintained by AI.
 
 **100+ tools across 6 categories** | **100% Python** | **MIT License**
 
 ## Contents
 
-| Directory | Description |
-|-----------|-------------|
-| `code/` | Code quality, API docs, testing, static analysis |
-| `git/` | Git commit helpers, gitignore generation |
-| `devops/` | System monitoring, Docker, cron, environment tools |
-| `data/` | JSON, CSV, YAML, XML format converters and validators |
-| `net/` | HTTP debugging, URL tools, network analysis |
-| `text/` | Text manipulation, formatting, search, statistics |
-| `util/` | Passwords, UUIDs, QR codes, screenshots, and more |
+| Directory | Description | Count |
+|-----------|-------------|-------|
+| `code/` | Code quality, API docs, testing, static analysis | ~9 |
+| `git/` | Git commit helpers, gitignore generation | ~3 |
+| `devops/` | System monitoring, Docker, cron, environment tools | ~17 |
+| `data/` | JSON, CSV, YAML, XML format converters and validators | ~14 |
+| `net/` | HTTP debugging, URL tools, network analysis | ~16 |
+| `text/` | Text manipulation, formatting, search, statistics | ~55 |
+| `util/` | Passwords, UUIDs, QR codes, screenshots, and more | ~27 |
 
 ## Quick Start
 
 ```bash
+# Clone
+git clone https://github.com/Guaiyu11/ai-code-reviewer.git
+cd ai-code-reviewer
+
 # Install dependencies
 pip install -r requirements.txt
 
-# Run any tool directly with Python
+# Run any tool directly
 python code/code-explainer.py your_code.py
+python text/regex-tester.py
+python net/port-scan.py 192.168.1.1
 
-# Or make them executable
+# Or make executable
 chmod +x code/code-explainer.py
 ./code/code-explainer.py your_code.py
 ```
@@ -35,108 +41,64 @@ chmod +x code/code-explainer.py
 ```
 ai-code-reviewer/
 ├── README.md
+├── setup.py              # pip installable
 ├── requirements.txt
-├── code/            # Code quality tools (9 tools)
+├── .gitignore
+├── LICENSE
+├── code/                 # Code quality tools
 │   ├── code-explainer.py
 │   ├── test-generator.py
 │   ├── dependency-audit.py
-│   └── ...
-├── git/             # Git tools (3 tools)
-│   ├── commit_gen.py
-│   └── ...
-├── devops/          # DevOps tools (17 tools)
+│   ├── api-docs-gen.py
 │   ├── dockerfile-linter.py
-│   ├── cron-parser.py
 │   └── ...
-├── data/            # Data format tools (14 tools)
+├── git/                  # Git tools
+│   ├── commit_gen.py
+│   └── gitignore-gen.py
+├── devops/               # DevOps tools
+│   ├── cron-parser.py
+│   ├── watch-process.py
+│   ├── kill-port.py
+│   └── ...
+├── data/                 # Data format tools
 │   ├── json-schema-validator.py
 │   ├── csv2json.py
+│   ├── json2csv.py
 │   └── ...
-├── net/             # Network tools (15 tools)
+├── net/                  # Network tools
 │   ├── http-headers.py
 │   ├── url-decode-all.py
+│   ├── port-scan.py
 │   └── ...
-├── text/            # Text processing (53 tools)
+├── text/                 # Text processing
 │   ├── regex-tester.py
 │   ├── sort-lines.py
+│   ├── extract-emails.py
 │   └── ...
-└── util/            # Utilities (27 tools)
+└── util/                 # Utilities
     ├── password-gen.py
     ├── uuid-generator.py
     └── ...
 ```
 
-## Tools Overview
+## Install as Package
 
-### Code Quality (`code/`)
-- `code-explainer.py` - Explain code structure and dependencies
-- `test-generator.py` - Auto-generate pytest tests from Python code
-- `dependency-audit.py` - Scan for known vulnerabilities in dependencies
-- `api-docs-gen.py` - Generate Markdown API documentation from docstrings
-- `dockerfile-linter.py` - Dockerfile security and best practice checks
-- `git-history-analysis.py` - Analyze commit patterns and contributors
-- And more...
+```bash
+pip install .
+```
 
-### Git Tools (`git/`)
-- `commit_gen.py` - Generate conventional commit messages
-- `gitignore-gen.py` - Generate .gitignore files for any project
-- `gitmoji_commits.py` - Emoji-enhanced git commits
+## Highlights
 
-### DevOps (`devops/`)
-- `cron-parser.py` - Parse, explain, and preview cron expressions
-- `watch-process.py` - Monitor process CPU and memory in real-time
-- `kill-port.py` - Find and kill processes using specific ports
-- `env-exec.py` - Run commands with environment from .env files
-- And more...
-
-### Data Formats (`data/`)
-- `json-schema-validator.py` - Validate JSON against schemas
-- `csv2json.py` / `json2csv.py` - Convert between CSV and JSON
-- `json2yaml.py` - JSON to YAML conversion
-- `pretty-xml.py` - Format and indent XML
-- `sql-formatter.py` - SQL formatting with performance analysis
-- And more...
-
-### Network (`net/`)
-- `http-headers.py` - Show HTTP response headers
-- `url-decode-all.py` - Recursively decode URL-encoded text
-- `port-scan.py` - Scan common ports on remote hosts
-- `domain-info.py` - DNS and WHOIS lookup
-- `mac-vendor.py` - MAC address vendor/OUI lookup
-- And more...
-
-### Text Processing (`text/`)
-- `regex-tester.py` - Live regex matching and testing
-- `sort-lines.py` - Sort lines by various criteria
-- `extract-emails.py` / `extract-urls.py` - Extract from text
-- `word-count.py` / `char-count.py` - Text statistics
-- `slug.py` - Convert text to URL-friendly slugs
-- And more...
-
-### Utilities (`util/`)
-- `password-gen.py` / `uuid-generator.py` - Generate secure passwords and UUIDs
-- `qrcode-gen.py` - Generate QR codes
-- `screenshot.py` - Take screenshots from CLI
-- `calc.py` - Expression calculator
-- `weather-cli.py` - Weather from CLI
-- And more...
-
-## Requirements
-
-- Python 3.7+
-- See `requirements.txt` for additional dependencies
-
-## Contributing
-
-This repo is AI-generated and maintained. Tools are organized by category.
+- **Zero dependencies** for most tools (pure Python stdlib)
+- **Single-file** each tool, easy to copy/paste
+- **MIT License** — free to use, modify, distribute
+- **AI-generated** and maintained
 
 ## Donate
 
-If you find this useful, consider donating Nano:
+If you find this useful:
 
-```
-nano_cix84h3anhf4xqxkro63x6go5onmoe8fh6qkqaoie8ddw8eyasuhigttg
-```
+Nano: `nano_cix84h3anhf4xqxkro63x6go5onmoe8fh6qkqaoie8ddw8eyasuhigttg`
 
 ## License
 
