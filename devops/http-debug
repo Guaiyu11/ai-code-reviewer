@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""
+HTTP Debug - Make HTTP requests and display formatted response with color-coded status, headers, and body.
+Usage: http-debug <url> [METHOD] [--data POST_DATA] [--header "K: V"] [--timeout SEC] [--follow] [--json]
+"""
+
+import argparse
+import json
+import sys
+import urllib.request
+import urllib.error
+import urllib.parse
+from typing import Optional
+
+# ANSI color codes
+COLORS = {
+    "reset": "\033[0m",
+    "bold": "\033[1m",
+    "dim": "\033[2m",
+    "red": "\033[91m",
+    "green": "\033[92m",
+    "yellow": "\033[93m",
+    "blue": "\033[94m",
+    "magenta": "\033[95m",
+    "cyan": "\033[96m",
+    "white": "\033[97m",
+}
+
+
+def colorize(text: str, color: str) -> str:
+    """Apply color to text."""
+    return f"{COLORS.get(color, '')}{text}{COLORS['reset']}"
+
+
+def status_color(code: int) -> str:
+    """Get color for HTTP status code."""
+    if 100 <= code < 200:
+        return "dim"      # Informational
+    elif 200 <= code < 300:
+        return "green"    # Success
+    elif 300 <= code < 400:
+        return "yellow"    # Redirect
+    elif 400 <= code < 500:
+        return "red"       # Client Error
+    else:
+        return "magenta"   # Server Error
+
+
+def format_headers(headers, use_color: bool = True) -> None:
+    """Format and print response headers."""
+    for key in sorted(headers.keys()):
+        val = headers[key]
+        if use_color:
+            print(f"  {colorize(key + ':', 'cyan')} {val}")
+        else:
+            print(f"  {key}: {val}")
+
+
+def format_body(body: bytes, content_type: str, use_color: bool = True) -> None:
+    """Format and print response body."""
+    try:
+        if 'json' in content_type.lower():
+            parsed = json.loads(body)
+            text = json.dumps(parsed, indent=2, ensure_ascii=False)
+            if use_color:
+                # Simple JSON colorization
+                for line in text.split('\n'):
+                    if ':' in line:
+                        key, val = line.split(':', 1)
+                        print(f"  {colorize(key + ':', 'magenta')}{colorize(val, 'green')}")
+                    else:
+                        print(f"  {colorize(line, 'white')}")
+            else:
+                print(text)
+        elif 'html' in content_type.lower():
+            # Strip HTML tags for readability
+            import re
+            text = re.sub(r'<[^>]+>', '', body.decode('utf-8', errors='replace'))
+            text = text.strip()
+            if use_color:
+                print(colorize(text[:2000], "white"))
+            else:
+                print(text[:2000])
+        else:
+            text = body.decode('utf-8', errors='replace')
+            if use_color:
+                print(colorize(text[:2000], "white"))
+            else:
+                print(text[:2000])
+    except Exception as e:
+        print(f"  (Could not parse body: {e})")
+        print(f"  Raw: {body[:500]}")
+
+
+def make_request(url: str, method: str = "GET", data: Optional[bytes] = None,
+                 headers: Optional[dict] = None, timeout: int = 30,
+                 follow_redirects: bool = True, use_color: bool = True) -> None:
+    """Make HTTP request and display formatted response."""
+    
+    if headers is None:
+        headers = {}
+    
+    # Default headers
+    req_headers = {
+        "User-Agent": "http-debug/1.0",
+        "Accept": "*/*",
+    }
+    req_headers.update(headers)
+    
+    # Build request
+    try:
+        req = urllib.request.Request(url, data=data, headers=req_headers, method=method)
+    except Exception as e:
+        print(f"Error building request: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Make request
+    try:
+        if follow_redirects:
+            opener = urllib.request.OpenerDirector()
+            opener.add_handler(urllib.request.HTTPRedirectHandler())
+            opener.add_handler(urllib.request.HTTPHandler())
+            opener.add_handler(urllib.request.HTTPSHandler())
+            response = opener.open(req, timeout=timeout)
+        else:
+            response = urllib.request.urlopen(req, timeout=timeout)
+    except urllib.error.HTTPError as e:
+        response = e
+    except urllib.error.URLError as e:
+        print(colorize(f"✗ Connection Error: {e.reason}", "red"))
+        sys.exit(1)
+    except Exception as e:
+        print(colorize(f"✗ Error: {e}", "red"))
+        sys.exit(1)
+    
+    # Status line
+    status = response.status
+    status_str = f"{status} {response.reason}"
+    color = status_color(status)
+    
+    print(colorize("┌─────────────────────────────────────────┐", "dim"))
+    print(colorize(f"│ HTTP/{response.version} {status_str.ljust(34)} │", color))
+    print(colorize("└─────────────────────────────────────────┘", "dim"))
+    
+    # Headers
+    print(colorize("\n◈ Response Headers:", "bold"))
+    format_headers(dict(response.headers), use_color)
+    
+    # Body
+    body = response.read()
+    content_type = response.headers.get('Content-Type', '')
+    content_len = response.headers.get('Content-Length', len(body))
+    
+    print(colorize(f"\n◈ Body ({content_len} bytes, {content_type}):", "bold"))
+    print(colorize("─────────────────────────────────────────────────", "dim"))
+    
+    if body:
+        format_body(body, content_type, use_color)
+    else:
+        print(colorize("  (empty response body)", "dim"))
+    
+    # Timing info if available
+    if hasattr(response, 'url'):
+        final_url = response.url
+        if final_url != url:
+            print(colorize(f"\n◈ Final URL: {final_url}", "yellow"))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Make HTTP requests and display formatted responses with color.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  http-debug https://api.github.com
+  http-debug https://httpbin.org/post POST --data '{"key":"value"}'
+  http-debug https://httpbin.org/get GET -H "Authorization: Bearer token"
+  http-debug https://httpbin.org/redirect/get GET --no-follow
+        """
+    )
+    parser.add_argument('url', help='URL to request')
+    parser.add_argument('method', nargs='?', default='GET', help='HTTP method (GET, POST, PUT, DELETE, etc.)')
+    parser.add_argument('--data', '-d', help='Request body data')
+    parser.add_argument('--header', '-H', action='append', metavar='K: V', help='Add request header (can be used multiple times)')
+    parser.add_argument('--timeout', '-t', type=int, default=30, help='Request timeout in seconds')
+    parser.add_argument('--no-follow', action='store_true', help='Do not follow redirects')
+    parser.add_argument('--no-color', '-nc', action='store_true', help='Disable color output')
+    parser.add_argument('--json', '-j', action='store_true', help='Set Content-Type to application/json')
+    
+    args = parser.parse_args()
+    
+    use_color = not args.no_color
+    
+    # Parse headers
+    headers = {}
+    if args.header:
+        for h in args.header:
+            if ':' in h:
+                key, val = h.split(':', 1)
+                headers[key.strip()] = val.strip()
+    
+    # JSON mode
+    if args.json and '--data' in sys.argv:
+        headers.setdefault('Content-Type', 'application/json')
+    
+    # Build data
+    data = None
+    if args.data:
+        if isinstance(args.data, str) and args.data.startswith('@'):
+            # File reference
+            filename = args.data[1:]
+            with open(filename, 'rb') as f:
+                data = f.read()
+        else:
+            data = args.data.encode('utf-8')
+    
+    make_request(
+        url=args.url,
+        method=args.method.upper(),
+        data=data,
+        headers=headers,
+        timeout=args.timeout,
+        follow_redirects=not args.no_follow,
+        use_color=use_color
+    )
+
+
+if __name__ == '__main__':
+    main()
