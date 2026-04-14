@@ -27,7 +27,26 @@ jobs:
 
       - name: Syntax check all Python files
         run: |
-          find . -name "*.py" -not -path "./.git/*" | xargs -I {} python -m py_compile {}
+          python -c "
+          import sys
+          from pathlib import Path
+          errors = []
+          for f in Path('.').rglob('*.py'):
+              if '.git' in str(f):
+                  continue
+              try:
+                  with open(f) as fp:
+                      compile(fp.read(), str(f), 'exec')
+              except SyntaxError as e:
+                  errors.append(f'{f}:{e.lineno}: {e.msg}')
+          if errors:
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          else:
+              total = len(list(Path('.').rglob('*.py')))
+              print(f'Syntax OK: {total} files checked')
+          "
 
       - name: Count tools
         run: |
@@ -44,4 +63,19 @@ jobs:
         run: pip install flake8
       - name: Lint
         run: |
-          find . -name "*.py" -not -path "./.git/*" | xargs -I {} flake8 {} --max-line-length=120 --ignore=E501,W503 || true
+          python -c "
+          import subprocess, sys
+          from pathlib import Path
+          errors = []
+          for f in sorted(Path('.').rglob('*.py')):
+              if '.git' in str(f):
+                  continue
+              r = subprocess.run(['flake8', str(f), '--max-line-length=120', '--ignore=E501,W503'], capture_output=True, text=True)
+              if r.stdout.strip():
+                  errors.append(r.stdout.strip())
+          if errors:
+              for e in errors[:20]:
+                  print(e)
+          else:
+              print('Lint OK')
+          "
