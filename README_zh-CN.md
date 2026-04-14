@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![中文](https://img.shields.io/badge/-中文-red.svg)](./README_zh-CN.md)
 
-精心整理的 100+ Python CLI 开发效率工具集合，由 AI 生成并维护。
+精心整理的 120+ Python CLI 开发效率工具集合，由 AI 生成并维护。
 
 **涵盖 7 大分类** | **纯 Python** | **MIT 许可证**
 

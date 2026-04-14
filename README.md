@@ -4,9 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 
-A curated collection of 100+ Python CLI productivity tools for developers, generated and maintained by AI.
+A curated collection of 120+ Python CLI productivity tools for developers, generated and maintained by AI.
 
-**100+ tools across 7 categories** | **100% Python** | **MIT License**
+**120+ tools across 7 categories** | **100% Python** | **MIT License**
 
 [**中文版**](./README_zh-CN.md)
 
@@ -14,10 +14,13 @@ A curated collection of 100+ Python CLI productivity tools for developers, gener
 
 | Directory | Description | Count |
 |-----------|-------------|-------|
-| `code/` | Code quality, API docs, testing, static analysis | ~9 |
-| `git/` | Git commit helpers, gitignore generation | ~3 |
-| `devops/` | System monitoring, Docker, cron, environment tools | ~17 |
-| `data/` | JSON, CSV, YAML, XML format converters and validators | ~14 |
+| `code/` | Code quality, API docs, testing, static analysis | ~17 |
+| `git/` | Git commit helpers, gitignore generation | ~17 |
+| `devops/` | System monitoring, Docker, cron, environment tools | ~21 |
+| `data/` | JSON, CSV, YAML, XML format converters and validators | ~17 |
+| `net/` | HTTP debugging, URL tools, network analysis | ~19 |
+| `text/` | Text manipulation, formatting, search, statistics | ~55 |
+| `util/` | Passwords, UUIDs, QR codes, screenshots, and more | ~27 |
 | `net/` | HTTP debugging, URL tools, network analysis | ~16 |
 | `text/` | Text manipulation, formatting, search, statistics | ~55 |
 | `util/` | Passwords, UUIDs, QR codes, screenshots, and more | ~27 |
