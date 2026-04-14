@@ -8,6 +8,8 @@ A curated collection of 100+ Python CLI productivity tools for developers, gener
 
 **100+ tools across 7 categories** | **100% Python** | **MIT License**
 
+[**中文版**](./README_zh-CN.md)
+
 ## Contents
 
 | Directory | Description | Count |
