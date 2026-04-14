@@ -1,8 +1,12 @@
 # AI Code Reviewer
 
+[![CI](https://github.com/Guaiyu11/ai-code-reviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/Guaiyu11/ai-code-reviewer/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+
 A curated collection of 100+ Python CLI productivity tools for developers, generated and maintained by AI.
 
-**100+ tools across 6 categories** | **100% Python** | **MIT License**
+**100+ tools across 7 categories** | **100% Python** | **MIT License**
 
 ## Contents
 
@@ -41,6 +45,7 @@ chmod +x code/code-explainer.py
 ```
 ai-code-reviewer/
 ├── README.md
+├── CONTRIBUTING.md
 ├── setup.py              # pip installable
 ├── requirements.txt
 ├── .gitignore
@@ -93,6 +98,11 @@ pip install .
 - **Single-file** each tool, easy to copy/paste
 - **MIT License** — free to use, modify, distribute
 - **AI-generated** and maintained
+- **CI tested** on Python 3.9, 3.10, 3.11, 3.12
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). All contributions welcome!
 
 ## Donate
 
