@@ -67,8 +67,7 @@ def generate_code_header(name, description):
     return CODE_HEADER.format(
         name=name,
         description=description,
-        date=datetime.now().strftime('%Y-%m-%d'),
-        name=name
+        date=datetime.now().strftime('%Y-%m-%d')
     )
 
 if __name__ == '__main__':

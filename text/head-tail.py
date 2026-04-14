@@ -34,11 +34,11 @@ if __name__ == '__main__':
         if arg == '--head' and i + 1 < len(sys.argv):
             n = int(sys.argv[i + 1])
             head(filepath, n)
-            return
+            sys.exit()
         elif arg == '--tail' and i + 1 < len(sys.argv):
             n = int(sys.argv[i + 1])
             tail(filepath, n)
-            return
+            sys.exit()
     
     # Default: head
     head(filepath, n)

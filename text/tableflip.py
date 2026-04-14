@@ -19,7 +19,7 @@ TABLEFLIPS = [
 
 def flip(text='┻━┻', emoticon='(╯°□°）╯'):
     """Generate tableflip."""
-    return f"{emoticon︵ {text}"
+    return f"{emoticon}︵{text}"
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
